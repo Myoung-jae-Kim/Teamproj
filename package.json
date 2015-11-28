@@ -1,0 +1,11 @@
+{
+  "main": "DoodleNote.html",
+  "name": "DoodleNote",
+
+  "window":
+  {
+    "toolbar": true
+  }
+
+
+}
