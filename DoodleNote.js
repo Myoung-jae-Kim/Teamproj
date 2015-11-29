@@ -52,7 +52,7 @@ $.fn.DoodleNote = function(modifiedSettings, modifiedLanguages)
 
     /**
      * Call-time configuration options and defaults
-     *처음 실행했을 때 Setting 목록
+    *처음 실행했을 때 Setting 목록
      */
     var settings = $.extend(
     {

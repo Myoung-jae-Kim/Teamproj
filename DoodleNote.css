@@ -35,9 +35,6 @@
     }
 .DoodleNote>div.toolbar>ul>li>a,
 .DoodleNote>ul.layerSelectCtrl>li>a{
-    /*background-image:    url('./images/pencil.png');*/
-    /*background-image:    url('./image/pencil.png');*/
-    background-image: none;
     background-size:     288px 36px;
     background-repeat:   no-repeat;
 }
@@ -70,17 +67,6 @@
     line-height:    0;
     min-height:    32px;
     border-bottom:  1px solid;
-    /*background-image:    url('./images/asset-toolbar-bg.png');*/
-    background-image:    url('./image/pencil.png');
-    background-position: -3px -7px;
-    background-repeat: no-repeat;
-    /*background-image:    url('./image/eraser.png');
-    background-position: 25px -7px;
-    background-repeat: no-repeat;*/
-
-    /*background-size:     1px 32px;*/
-    /*background-size:     1px 32px;*/
-    /*background-repeat:   repeat-x;*/
     }
 .DoodleNote>div.toolbar>ul{
     list-style-type: none;
@@ -111,13 +97,11 @@
     }
 .DoodleNote>div.toolbar>ul>li>a.draw{
     background-position: -2px -2px;
-    /*background-image:    url('./image/pencil.png');*/
-    /*list-style-image: url('./image/pencil.png');*/
-    /*background-position: -3px -7px;*/
-    /*background-repeat: no-repeat;*/
+    background: url('./image/pencil.png') round;
     }
 .DoodleNote>div.toolbar>ul>li>a.erase{
     background-position: -38px -2px;
+    background: url('./image/eraser.png') round;
     }
 .DoodleNote>div.toolbar>ul>li>a.line{
     background-position: -218px -3px;
