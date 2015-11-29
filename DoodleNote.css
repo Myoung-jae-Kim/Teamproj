@@ -105,15 +105,18 @@
     }
 .DoodleNote>div.toolbar>ul>li>a.line{
     background-position: -218px -3px;
+    background: url('./image/line.png') round;
     }
 .DoodleNote>div.toolbar>ul>li>a.colorSelect{
     background-position: -74px -2px;
+    background: url('./image/color.png') round;
     }
 .DoodleNote>div.toolbar>ul>li>a.layerSelect{
     background-position: -110px -2px;
     }
 .DoodleNote>div.toolbar>ul>li>a.options{
     background-position: -254px -2px;
+    background: url('./image/setting.png') round;
     }
 .DoodleNote>div.toolbar>ul>li>a:hover,
 .DoodleNote>div.toolbar>ul>li>a:focus{
