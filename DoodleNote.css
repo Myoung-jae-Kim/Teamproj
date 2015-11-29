@@ -106,7 +106,15 @@
 .DoodleNote>div.toolbar>ul>li>a.line{
     background-position: -218px -3px;
     background: url('./image/line.png') round;
-    }
+  }
+.DoodleNote>div.toolbar>ul>li>a.circle{
+    /*background-position: -218px -3px;*/
+    background: url('./image/circle.png') round;
+  }
+.DoodleNote>div.toolbar>ul>li>a.rectangle{
+    /*background-position: -218px -3px;*/
+    background: url('./image/rectangle.png') round;
+}
 .DoodleNote>div.toolbar>ul>li>a.colorSelect{
     background-position: -74px -2px;
     background: url('./image/color.png') round;
@@ -355,11 +363,6 @@
     }
 
     #textarea{
-      width: 800px;
-    }
-
-    #textarea1{
-      width: 800px;
-      margin-top: -10px;
-
+      width: 795px;
+      margin-top: 1em;
     }

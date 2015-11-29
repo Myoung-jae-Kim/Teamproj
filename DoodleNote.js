@@ -59,7 +59,7 @@ $.fn.DoodleNote = function(modifiedSettings, modifiedLanguages)
         'showToolbar'      : true,
         'showMouseInfo'    : true,
         'preventPageClose' : true,
-        'tools'            : ['draw', 'line', 'erase'],
+        'tools'            : ['draw', 'line', 'erase', 'circle', 'rectangle'],
         'ctrls'            : ['layerSelect', 'colorSelect', 'options'],
         'defaultTool'      : 'draw',
         'toolColors'       : colors,
@@ -84,11 +84,15 @@ $.fn.DoodleNote = function(modifiedSettings, modifiedLanguages)
         'en-US':
         {
             // Tools
+            // 그리기 도구 선택
             'draw' : {'title': 'Draw'},
             'line' : {'title': 'Line'},
             'erase': {'title': 'Erase'},
+            'circle': {'title': 'Circle'},
+            'rectangle': {'title': 'Rectangle'},
 
             // Controls
+            // 색상 선택
             'colorSelect':
             {
                 'title' : 'Select Colors',
@@ -106,6 +110,7 @@ $.fn.DoodleNote = function(modifiedSettings, modifiedLanguages)
                 'renamePrompt': 'Rename [NAME] to:',
                 'deletePrompt': 'Delete [NAME]?'
             },
+            //옵션 모음
             'options':
             {
                 'title'             : 'Extras',
@@ -181,6 +186,10 @@ $.fn.DoodleNote = function(modifiedSettings, modifiedLanguages)
                 toolbar.tools.push(new DoodleNoteTool_line($this));
             if ($this.settings.tools.indexOf('erase') != -1)
                 toolbar.tools.push(new DoodleNoteTool_erase($this));
+            if ($this.settings.tools.indexOf('circle') != -1)
+                toolbar.tools.push(new DoodleNoteTool_circle($this));
+            if ($this.settings.tools.indexOf('rectangle') != -1)
+                toolbar.tools.push(new DoodleNoteTool_rectangle($this));
 
             // Show the tool resizer
             if ($this.settings.showToolResize)
@@ -300,6 +309,7 @@ function DoodleNoteUtil_createControlTrigger(caller, associated, associatedSibli
 # Get mouse x and y position relative to canvas
 ###############################################################################
 */
+//canvas안에 있는 마우스의 x,y 좌표값을 리턴
 function DoodleNoteUtil_canvasMousePos(parent, mouse)
 {
     var offset = parent.offset();
@@ -1053,6 +1063,51 @@ DoodleNoteTool_line.prototype.draw = function()
 
 /*
 ###############################################################################
+# The circle Tool
+###############################################################################
+*/
+function DoodleNoteTool_circle(DoodleNote)
+{
+    // initialisation
+    this.DoodleNote    = DoodleNote;
+    this.title    = this.DoodleNote.language['circle']['title'];;
+    this.trigger  = 'circle';
+    this.lineJoin = this.DoodleNote.lineJoin;
+    this.lineCap  = this.DoodleNote.lineCap;
+};
+DoodleNoteTool_circle.prototype.init = function()
+{
+    // Event Handlers [Trigger]
+    DoodleNoteUtil_createToolTrigger(this);
+
+    // Event handlers [Tool]
+    new DoodleNoteUtil_bindLineEvents(this, this.lineJoin, this.lineCap, false);
+};
+
+/*
+###############################################################################
+# The circle Tool
+###############################################################################
+*/
+function DoodleNoteTool_rectangle(DoodleNote)
+{
+    // initialisation
+    this.DoodleNote    = DoodleNote;
+    this.title    = this.DoodleNote.language['rectangle']['title'];;
+    this.trigger  = 'rectangle';
+    this.lineJoin = this.DoodleNote.lineJoin;
+    this.lineCap  = this.DoodleNote.lineCap;
+};
+DoodleNoteTool_rectangle.prototype.init = function()
+{
+    // Event Handlers [Trigger]
+    DoodleNoteUtil_createToolTrigger(this);
+
+    // Event handlers [Tool]
+    new DoodleNoteUtil_bindLineEvents(this, this.lineJoin, this.lineCap, false);
+};
+/*
+###############################################################################
 # Toolbar
 ###############################################################################
 */
@@ -1062,12 +1117,10 @@ function DoodleNote_Toolbar(DoodleNote, settings)
     this.tools = [];
     this.ctrls = [];
 };
+
+//Toolbar Build up
 DoodleNote_Toolbar.prototype.build = function()
 {
-    // A DoodleNote can only have 1 toolbar
-    if (this.DoodleNote.find('.toolbar').length != 0)
-        this.DoodleNote.remove('.toolbar');
-
     // Container
     var $toolbar = $('<div>', {'class': 'toolbar'});
 
@@ -1082,8 +1135,6 @@ DoodleNote_Toolbar.prototype.build = function()
         $item.append($link);
         $tools.append($item);
     }
-
-
 
     // Controls
     var $ctrls = $('<ul>');
@@ -1114,4 +1165,4 @@ DoodleNote_Toolbar.prototype.build = function()
 */
 $(document).ready(function(){
     $('.DoodleNote').DoodleNote();
-    });
+});

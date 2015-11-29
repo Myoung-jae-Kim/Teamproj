@@ -4,6 +4,8 @@
 
   "window":
   {
-    "toolbar": true
+    "toolbar": true,
+    "width": 850,
+    "height": 800
   }
 }
