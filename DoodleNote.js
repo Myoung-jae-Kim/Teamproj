@@ -30,10 +30,11 @@
 {
 $.fn.DoodleNote = function(modifiedSettings, modifiedLanguages)
 {
-    /**
+    /*
      * Default color selection. This can be replaced at call time by passing
      * an array of hex values (without leading #) to the modifiedSettings
      * paramater with the following keys: 'toolColors', 'canvasColors'
+     * color 선택하는 배열 'toolColors', 'canvasColor'
      */
     var colors =
     [
@@ -51,6 +52,7 @@ $.fn.DoodleNote = function(modifiedSettings, modifiedLanguages)
 
     /**
      * Call-time configuration options and defaults
+     *처음 실행했을 때 Setting 목록
      */
     var settings = $.extend(
     {
