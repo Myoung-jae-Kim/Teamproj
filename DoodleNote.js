@@ -90,7 +90,6 @@ $.fn.DoodleNote = function(modifiedSettings, modifiedLanguages)
             'erase': {'title': 'Erase'},
             'circle': {'title': 'Circle'},
             'rectangle': {'title': 'Rectangle'},
-
             // Controls
             // 색상 선택
             'colorSelect':
@@ -124,9 +123,10 @@ $.fn.DoodleNote = function(modifiedSettings, modifiedLanguages)
                                       '\n\nAre you sure you want to proceed?',
                 'resizeToolPrompt'  : 'Enter desired tool size.' +
                                       '\n\nMinimum size: 1, 최대크기: [MAXSIZE].',
-                'resizeToolWarning' : 'Tool size must be 1 or more, 최대크기 [MAXSIZE].'
+                'resizeToolWarning' : 'Tool size must be 1 or more, 최대크기 [MAXSIZE].',
+                'save'              : 'Save',
+                'load'              : 'Load'
             },
-
             // Other
             'unloadWarning': 'Warning: Your drawing(s) will be destroyed.'
         }
@@ -140,37 +140,29 @@ $.fn.DoodleNote = function(modifiedSettings, modifiedLanguages)
         // Skip if this element is already a DoodleNote instance
         if ($(this).hasClass('DoodleNoteInstance')) return;
         var $this = $(this);
-
         // Grab local references to settings and chosen language parts
         $this.settings = settings;
         $this.language = languages[$this.settings['language']];
-
         // Mark this element as a DoodleNote instance and add styling class
         $this.addClass('DoodleNoteInstance');
         $this.addClass('DoodleNote');
-
         // Clear the container
         $this.html('');
-
         // Set-up layering and colours
         $this.layers = new DoodleNoteTool_layerSelect($this);
         $this.colors = new DoodleNoteTool_colorSelect($this);
-
         // Hold the generic tool properties
         $this.toolWidth    = settings.defaultToolWidth;
         $this.maxToolWidth = settings.maxToolWidth;
         $this.lineJoin     = settings.defaultLineJoin;
         $this.lineCap      = settings.defaultLineCap;
-
         // Hold the trigger name of the active tool
         $this.activeTool = undefined;
-
         // Append the toolbar, if specified
         if ($this.settings.showToolbar)
         {
             // The basic toolbar item
             var toolbar = new DoodleNote_Toolbar($this);
-
             // Add specified controls to toolbar
             if ($this.settings.ctrls.indexOf('options') != -1)
                 toolbar.ctrls.push(new DoodleNoteTool_options($this));
@@ -178,7 +170,6 @@ $.fn.DoodleNote = function(modifiedSettings, modifiedLanguages)
                 toolbar.ctrls.push($this.colors);
             if ($this.settings.ctrls.indexOf('layerSelect') != -1)
                 toolbar.ctrls.push($this.layers);
-
             // Add specified tools
             if ($this.settings.tools.indexOf('draw') != -1)
                 toolbar.tools.push(new DoodleNoteTool_draw($this));
@@ -190,17 +181,14 @@ $.fn.DoodleNote = function(modifiedSettings, modifiedLanguages)
                 toolbar.tools.push(new DoodleNoteTool_circle($this));
             if ($this.settings.tools.indexOf('rectangle') != -1)
                 toolbar.tools.push(new DoodleNoteTool_rectangle($this));
-
             // Show the tool resizer
             if ($this.settings.showToolResize)
             {
                 // alert("Hello");
             }
-
             // Add the toolbar into the DOM
             toolbar.build();
         }
-
         // Display mouse x and y position
         if ($this.settings.showMouseInfo)
         {
@@ -216,7 +204,6 @@ $.fn.DoodleNote = function(modifiedSettings, modifiedLanguages)
                 $this.info.html('');
             });
         }
-
         // Prevent accidental page closes
         if ($this.settings['preventPageClose'])
         {
@@ -225,10 +212,8 @@ $.fn.DoodleNote = function(modifiedSettings, modifiedLanguages)
                 return $this.language['unloadWarning'];
             });
         }
-
         // Intercept all link triggers in the container
         $this.on('click', 'a', function(e){e.preventDefault();});
-
         // Simulate a click on the default tool
         $this.find('a.' + $this.settings['defaultTool']).first().click();
     });
@@ -236,26 +221,21 @@ $.fn.DoodleNote = function(modifiedSettings, modifiedLanguages)
 })(jQuery);
 
 /*
-###############################################################################
 # Select a list item excluseively (for tools and controls),
 # Using the 'caller' reference, mark it as active and remove active flag from
 # all siblings. If 'associatedSiblings' is specified, all elements in the
 # parent instance with the passed class will be deactivated. If 'associated'
 # is spedified, the element(s) with that class name will be activated.
 # If keepAlibe is true, clicking on an active triger will not deactivate it.
-###############################################################################
 */
 function DoodleNoteUtil_selectEx(DoodleNote, caller, associated, associatedSiblings, keepAlive)
 {
     // Find the caller siblings
     var callerSiblings = caller.parent().siblings('li').children('a');
-
     // Find the controller, if specified
     associated = (associated === undefined)? associated: DoodleNote.find(associated).first();
-
     // Record the active state
     var wasActive = caller.hasClass('active');
-
     // Activate / Deactivate Triggers
     if (wasActive)
     {
@@ -272,11 +252,8 @@ function DoodleNoteUtil_selectEx(DoodleNote, caller, associated, associatedSibli
             associated.fadeIn(150);
     }
 }
-
 /*
-###############################################################################
 # Create event handlers to activate a tool
-###############################################################################
 */
 function DoodleNoteUtil_createToolTrigger(caller)
 {
@@ -286,15 +263,12 @@ function DoodleNoteUtil_createToolTrigger(caller)
         caller.DoodleNote.activeTool = caller.trigger;
     });
 }
-
 /*
-###############################################################################
 # Create event handlers to activate a control
 # associated is the class of the associated controller.
 # associatedSiblings is the class of all controllers of this type
 # A resulting event trigger will hide associatedSiblings and show associated
 # or hide associated if it's already showing.
-###############################################################################
 */
 function DoodleNoteUtil_createControlTrigger(caller, associated, associatedSiblings)
 {
@@ -303,11 +277,8 @@ function DoodleNoteUtil_createControlTrigger(caller, associated, associatedSibli
         DoodleNoteUtil_selectEx(caller.DoodleNote, $(this), associated, associatedSiblings);
     });
 }
-
 /*
-###############################################################################
 # Get mouse x and y position relative to canvas
-###############################################################################
 */
 //canvas안에 있는 마우스의 x,y 좌표값을 리턴
 function DoodleNoteUtil_canvasMousePos(parent, mouse)
@@ -318,17 +289,13 @@ function DoodleNoteUtil_canvasMousePos(parent, mouse)
         y: Math.floor(mouse.pageY - offset.top - 32)
     };
 }
-
 /*
-###############################################################################
 # Set-up event handlers for the specified object, which initiate path drawing,
 # to specified parameters. The calling tool should pass itself as caller and
 # should specify the preferred lineJoin and lineCap types. Operation can also
 # be additive (draw) or subtractive (erase)
-#
 # !IMPORTANT This refactored version makes use of the smoothing procedure
 # detailed by user Simon Sarris @ http://stackoverflow.com/questions/10567287/
-###############################################################################
 */
 function DoodleNoteUtil_bindLineEvents(caller, lineJoin, lineCap, additive)
 {
@@ -340,7 +307,7 @@ function DoodleNoteUtil_bindLineEvents(caller, lineJoin, lineCap, additive)
     this.layer  = null;
 
     var mouseDown = false;
-    var DoodleNote     = this.DoodleNote;
+    var DoodleNote= this.DoodleNote;
     var self      = this;
 
     DoodleNote.on('mousedown', 'canvas', function(e)
@@ -349,33 +316,25 @@ function DoodleNoteUtil_bindLineEvents(caller, lineJoin, lineCap, additive)
         {
             // Initiate drawing
             mouseDown = true;
-
             // Get the toolCanvas context
             self.ctx = DoodleNote.layers.toolCanvas[0].getContext('2d');
-
             // Set the composite operation and styling
             self.ctx.globalCompositeOperation = self.compOp;
             self.ctx.lineWidth                = DoodleNote.toolWidth;
             self.ctx.lineJoin                 = lineJoin;
             self.ctx.lineCap                  = lineCap;
-
             // Set the stroke style
             self.ctx.strokeStyle = (additive)? '#' + DoodleNote.colors.activeColor: 'rgba(0,0,0,1)';
             self.ctx.fillStyle   = self.ctx.strokeStyle;
-
             // Push first point
             self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
             self.points.push({'x': self.offset.x, 'y': self.offset.y});
-
             // Get the operating layer
             self.layer = DoodleNote.layers.indexOf(DoodleNote.layers.activeLayer);
-
             // Hide the active layer canvas (work will take place on the tool canvas)
             DoodleNote.layers.layers[self.layer]['canvas'].hide();
-
             // Draw to current state
             self.draw(false);
-
             // Prevents cursor changing to a selection pointer
             return false;
         }
@@ -386,10 +345,8 @@ function DoodleNoteUtil_bindLineEvents(caller, lineJoin, lineCap, additive)
             // Push point
             self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
             self.points.push({'x': self.offset.x, 'y': self.offset.y});
-
             // Clear the toolCanvas
             self.ctx.clearRect(0, 0, DoodleNote.layers.width, DoodleNote.layers.height);
-
             // Draw to current state
             self.draw(false);
         }
@@ -399,29 +356,22 @@ function DoodleNoteUtil_bindLineEvents(caller, lineJoin, lineCap, additive)
         {
             // Terminate drawing
             mouseDown = false;
-
             // Unhide the active layer canvas
             DoodleNote.layers.layers[self.layer]['canvas'].show();
-
             // Clear the toolCanvas
             self.ctx.clearRect(0, 0, DoodleNote.layers.width, DoodleNote.layers.height);
-
             // Get the layer context
             self.ctx = DoodleNote.layers.layers[self.layer]['ctx'];
-
             // Set the composite operation and styling
             self.ctx.globalCompositeOperation = self.compOp;
             self.ctx.lineWidth                = DoodleNote.toolWidth;
             self.ctx.lineJoin                 = lineJoin;
             self.ctx.lineCap                  = lineCap;
-
             // Set the stroke style
             self.ctx.strokeStyle = (additive)? '#' + DoodleNote.colors.activeColor: 'rgba(0,0,0,1)';
             self.ctx.fillStyle   = self.ctx.strokeStyle;
-
             // Draw to current state
             self.draw(true);
-
             // Reset
             self.points = [];
         }
@@ -436,13 +386,9 @@ DoodleNoteUtil_bindLineEvents.prototype.draw = function(drawReal)
         this.ctx.drawImage(this.DoodleNote.layers.layers[this.layer]['canvas'][0], 0, 0);
         this.ctx.globalCompositeOperation = this.compOp;
     }
-
-    //##############################################################################
     //# !IMPORTANT with only a few small changes to better accomodate layering, this
     //# method has been copied almost verbatim from the jsFiddle linked to by user
     //# Simon Sarris @ http://stackoverflow.com/questions/10567287/
-    //##############################################################################
-
     // For short movements, draw a simple circle
     if (this.points.length < 6)
     {
@@ -467,12 +413,7 @@ DoodleNoteUtil_bindLineEvents.prototype.draw = function(drawReal)
         this.ctx.stroke();
     }
 };
-
-/*
-###############################################################################
-# The Colour Picker Control
-###############################################################################
-*/
+// The Colour Picker Control
 function DoodleNoteTool_colorSelect(DoodleNote)
 {
     // Initialisation
@@ -481,17 +422,14 @@ function DoodleNoteTool_colorSelect(DoodleNote)
     this.trigger     = 'colorSelect';
     this.activeColor = this.DoodleNote.settings.activeColor;
     this.canvasColor = this.DoodleNote.settings.canvasColor;
-
     // Push the HTML
     this.DoodleNote.append('<div class=\'colorSelectCtrl ctrlr\'>' +
         '<p>' + this.DoodleNote.language['colorSelect']['tool'] + '</p><ul></ul>' +
         '<p>' + this.DoodleNote.language['colorSelect']['canvas'] + '</p><ul></ul></div>'
         );
-
     // Cache the selection menus
     var activeSelect = DoodleNote.find('.colorSelectCtrl>ul:first-of-type');
     var canvasSelect = DoodleNote.find('.colorSelectCtrl>ul:last-of-type');
-
     // Push the tool colors
     for (i = 0; i < this.DoodleNote.settings.toolColors.length; ++i)
     {
@@ -506,7 +444,6 @@ function DoodleNoteTool_colorSelect(DoodleNote)
                 )
             );
     }
-
     // Push the canvas colors
     for (i = 0; i < this.DoodleNote.settings.canvasColors.length; ++i)
     {
@@ -521,11 +458,9 @@ function DoodleNoteTool_colorSelect(DoodleNote)
                 )
             );
     }
-
     // Flag selected colours as active
     activeSelect.find('a.' + this.activeColor).addClass('active');
     canvasSelect.find('a.' + this.canvasColor).addClass('active');
-
     // Set the initial canvas colour
     DoodleNote.css('backgroundColor', '#' + this.canvasColor);
 }
@@ -534,10 +469,8 @@ DoodleNoteTool_colorSelect.prototype.init = function()
 {
     var self  = this;
     var DoodleNote = this.DoodleNote;
-
     // Event Handlers [Trigger]
     DoodleNoteUtil_createControlTrigger(this, '.colorSelectCtrl', '.ctrlr');
-
     // Event Handlers [Ctrl]
     var activeSelects = DoodleNote.find('.colorSelectCtrl>ul:first-of-type a');
     activeSelects.click(function()
@@ -555,12 +488,7 @@ DoodleNoteTool_colorSelect.prototype.init = function()
         DoodleNote.css('backgroundColor', '#' + self.canvasColor);
     });
 };
-
-/*
-###############################################################################
-# Extra Options
-###############################################################################
-*/
+// Extra Options
 function DoodleNoteTool_options(DoodleNote)
 {
     // initialisation
@@ -572,7 +500,8 @@ function DoodleNoteTool_options(DoodleNote)
     this.hardReset   = $('<a>', {'href': '#', 'class': 'hardReset'});
     this.clearLayer  = $('<a>', {'href': '#', 'class': 'clearLayer'});
     this.exportImage = $('<a>', {'href': '#', 'class': 'exportImage'});
-
+    this.save        = $('<a>', {'href': '#', 'class': 'save'});
+    this.load        = $('<a>', {'href': '#', 'class': 'load'});
     // Push the HTML
     this.resizeTool.text(this.DoodleNote.language['options']['resizeTool']);
     this.container.append(this.resizeTool);
@@ -586,6 +515,12 @@ function DoodleNoteTool_options(DoodleNote)
     this.exportImage.text(this.DoodleNote.language['options']['exportImage']);
     this.container.append(this.exportImage);
 
+    this.save.text(this.DoodleNote.language['options']['save']);
+    this.container.append(this.save);
+
+    this.load.text(this.DoodleNote.language['options']['load']);
+    this.container.append(this.load);
+
     this.DoodleNote.append(this.container);
 }
 
@@ -595,11 +530,8 @@ DoodleNoteTool_options.prototype.init = function()
     var DoodleNote  = this.DoodleNote;
     var layers = this.DoodleNote.layers;
     var colors = this.DoodleNote.colors;
-
     // Event Handlers [Trigger]
     DoodleNoteUtil_createControlTrigger(this, '.optionsCtrl', '.ctrlr');
-
-
     // Event handlers [Tool radius]
     this.resizeTool.on('click', function(e)
     {
@@ -607,7 +539,6 @@ DoodleNoteTool_options.prototype.init = function()
         var promptMsg   = DoodleNote.language['options']['resizeToolPrompt'].replace('\[MAXSIZE\]', DoodleNote.maxToolWidth);
         var newSize     = parseInt(prompt(promptMsg, DoodleNote.toolWidth));
         if (!newSize) return;
-
         // Enforce tool tool size limits
         if (newSize < 1 || newSize > DoodleNote.maxToolWidth)
         {
@@ -617,7 +548,6 @@ DoodleNoteTool_options.prototype.init = function()
         else
             DoodleNote.toolWidth = newSize;
     });
-
     // Event handlers [Hard Reset]
     this.hardReset.on('click', function(e)
     {
@@ -625,14 +555,12 @@ DoodleNoteTool_options.prototype.init = function()
         var confirmed = confirm(DoodleNote.language['options']['hardResetWarning']);
         if (!confirmed) return;
         e.preventDefault();
-
         // Reset
         $('.textarea').val('');
         DoodleNote.removeClass('DoodleNoteInstance');
         DoodleNote.removeClass('DoodleNote');
         DoodleNote.DoodleNote();
     });
-
     // Event handlers [Clear Layer]
     this.clearLayer.on('click', function(e)
     {
@@ -640,12 +568,10 @@ DoodleNoteTool_options.prototype.init = function()
         var confirmed = confirm(DoodleNote.language['options']['clearLayerWarning']);
         if (!confirmed) return;
         e.preventDefault();
-
         // Clear
         var layer = layers.indexOf(layers.activeLayer);
         layers.layers[layer]['ctx'].clearRect(0, 0, layers.width, layers.height);
     });
-
     // Event handler [Export Image]
     this.exportImage.on('click', function()
     {
@@ -654,33 +580,33 @@ DoodleNoteTool_options.prototype.init = function()
         canvas.attr('width',  layers.width);
         canvas.attr('height', layers.height);
         var ctx = canvas[0].getContext('2d');
-
         // Fill the canvas with the canvas color
         ctx.beginPath();
         ctx.fillStyle = '#' + colors.canvasColor;
         ctx.fillRect(0, 0, layers.width, layers.height);
         ctx.closePath();
-
         // Overlay each layer on the canvas
         ctx.globalCompositeOperation = 'source-over';
         for (i = 0; i < layers.layers.length; i++)
         {
             ctx.drawImage(layers.layers[i]['canvas'][0], 0, 0);
         }
-
         // Get the canvas as an image (base64 encoded PNG)
         var data = canvas[0].toDataURL();
-
         // Open the image in a new tab
         window.open(data, '_blank');
     });
+    // Event handler [save]
+    this.save.on('click', function() {
+      alert("click save");
+    });
+    // Event handler [load]
+    this.load.on('click', function() {
+      alert("click load");
+    });
 };
 
-/*
-###############################################################################
-# The Layer Select Control
-###############################################################################
-*/
+// Layer Select
 function DoodleNoteTool_layerSelect(DoodleNote)
 {
     // Initialisation
@@ -694,17 +620,13 @@ function DoodleNoteTool_layerSelect(DoodleNote)
     this.container   = $('<ul>', {'class': 'layerSelectCtrl ctrlr'});
     this.toolCanvas  = $('<canvas>', {'class': 'toolCanvas'});
     this.layerCount  = 0;
-
     // Add a dummy canvas for tools to use
     this.toolCanvas.attr({'width': this.width, 'height': this.height});
     this.DoodleNote.prepend(this.toolCanvas);
-
     // Create initial layer
     this.createLayer('Background');
-
     // Push the container html
     this.DoodleNote.append(this.container);
-
     // Push the add layer button
     this.container.append
     (
@@ -714,10 +636,8 @@ function DoodleNoteTool_layerSelect(DoodleNote)
             'title': this.DoodleNote.language['layerSelect']['add']
         }))
     );
-
     //Initial Build
     this.build();
-
     // Select top layer
     this.selectLayer();
 }
@@ -760,7 +680,6 @@ DoodleNoteTool_layerSelect.prototype.build = function()
 {
     // Clear the container contents
     this.container.find('li:not(:last-of-type)').remove();
-
     // Push layer entries HTML
     for (i = 0; i < this.layers.length; ++i)
     {
@@ -776,20 +695,16 @@ DoodleNoteTool_layerSelect.prototype.selectLayer = function(caller)
 {
     // Remove all layer active flags
     this.container.find('li').removeClass('active');
-
     // If no caller is passed, select the highest layer
     if (caller == undefined)
         caller = this.container.find('li.' + this.layers[(this.layers.length - 1)]['realName']);
-
     // Select layer
     caller.addClass('active');
     var layer        = this.indexOf(caller.attr('class').split(' ')[0]);
     this.activeLayer = this.layers[layer].realName;
-
     // Move the toolCanvas to above the active layer
     var toolCanvas = this.toolCanvas.detach();
     toolCanvas.insertAfter(this.layers[layer]['canvas']);
-
 }
 
 DoodleNoteTool_layerSelect.prototype.init = function()
@@ -797,44 +712,30 @@ DoodleNoteTool_layerSelect.prototype.init = function()
     var self   = this;
     var DoodleNote  = this.DoodleNote;
     var layers = this.layers;
-
     // Event Handlers [Trigger]
     DoodleNoteUtil_createControlTrigger(this, '.layerSelectCtrl', '.ctrlr');
-
     // Event Handler [Add Layer]
     this.container.on('click', 'li:last-of-type>a', function()
     {
-        /////////////////////
         // Add
-        /////////////////////
-
         // Prompt for Layer Name
         var defaultName = DoodleNote.language['layerSelect']['newName'].replace('\[NUM\]', self.layerCount);
         var name        = prompt(DoodleNote.language['layerSelect']['newPrompt'], defaultName);
         if (!name) return;
         else name       = (name !== null && name.length > 0)? name: defaultName;
-
         // Create Layer
         self.createLayer(name);
-
         // Redraw
         self.build();
-
         // Simulate selection click
         self.container.children('li:first-of-type').click();
     }).on('click', 'li:not(:last-of-type)', function()
     {
-        /////////////////////
         // Select
-        /////////////////////
-
         self.selectLayer($(this));
     }).on('dblclick', 'li:not(:last-of-type)', function()
     {
-        /////////////////////
         // Rename
-        /////////////////////
-
         // Find the object reference
         var layer = self.indexOf($(this).attr('class').split(' ')[0]);
 
@@ -846,52 +747,37 @@ DoodleNoteTool_layerSelect.prototype.init = function()
             var name        = prompt(promptMsg, defaultName);
             if (!name) return;
             else name       = (name.length > 0)? name: defaultName;
-
             // Update the layer and rebuild
             layers[layer]['name'] = name;
             self.build();
-
             // Simulate selection click
             self.container.find('.' + layers[layer]['realName']).click();
         }
     }).on('click', 'li:not(:last-of-type)>a', function(e)
     {
-        /////////////////////
         // Delete
-        /////////////////////
-
         // Prevent the click event triggering on the parent
         e.stopPropagation();
         e.preventDefault();
-
         // Find the object reference
         var layer = self.indexOf($(this).parent().attr('class').split(' ')[0]);
         if (layer === -1 || layer === 0) return;
-
         // Prompt for confirmation
         var promptMsg = DoodleNote.language['layerSelect']['deletePrompt'].replace('\[NAME\]', layers[layer]['name']);
         var confirmed = confirm(promptMsg);
         if (!confirmed) return;
-
         // Remove the associated canvas and menu item from the DOM
         DoodleNote.find('.' + layers[layer]['realName']).remove();
-
         // Remove the collection item
         layers.splice(layer, 1);
-
         // Rebuild container
         self.build();
-
         // Select top layer
         self.selectLayer();
     });
 }
 
-/*
-###############################################################################
-# The Draw Tool
-###############################################################################
-*/
+// Draw
 function DoodleNoteTool_draw(DoodleNote)
 {
     // initialisation
@@ -910,11 +796,7 @@ DoodleNoteTool_draw.prototype.init = function()
     new DoodleNoteUtil_bindLineEvents(this, this.lineJoin, this.lineCap, true);
 };
 
-/*
-###############################################################################
-# The Erase Tool
-###############################################################################
-*/
+// Erase
 function DoodleNoteTool_erase(DoodleNote)
 {
     // initialisation
@@ -928,16 +810,11 @@ DoodleNoteTool_erase.prototype.init = function()
 {
     // Event Handlers [Trigger]
     DoodleNoteUtil_createToolTrigger(this);
-
     // Event handlers [Tool]
     new DoodleNoteUtil_bindLineEvents(this, this.lineJoin, this.lineCap, false);
 };
 
-/*
-###############################################################################
-# The Line Tool
-###############################################################################
-*/
+// Line
 function DoodleNoteTool_line(DoodleNote)
 {
     // initialisation
@@ -956,7 +833,6 @@ DoodleNoteTool_line.prototype.init = function()
 {
     // Event Handlers [Trigger]
     DoodleNoteUtil_createToolTrigger(this);
-
     // Event handlers [Tool]
     var self    = this;
     var DoodleNote   = this.DoodleNote;
@@ -969,10 +845,8 @@ DoodleNoteTool_line.prototype.init = function()
             {
                 // Initiate drawing
                 self.drawing = true;
-
                 // Get the toolCanvas context
                 self.ctx = DoodleNote.layers.toolCanvas[0].getContext('2d');
-
                 // Set the composite operation and styling
                 self.ctx.lineWidth                = DoodleNote.toolWidth;
                 self.ctx.lineJoin                 = self.lineJoin;
@@ -980,17 +854,13 @@ DoodleNoteTool_line.prototype.init = function()
                 self.ctx.strokeStyle              = '#' + DoodleNote.colors.activeColor;
                 self.ctx.fillStyle                = '#' + DoodleNote.colors.activeColor;
                 self.ctx.globalCompositeOperation = 'source-over';
-
                 // Push first point
                 self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
                 self.points.push({'x': self.offset.x, 'y': self.offset.y});
-
                 // Get the operating layer
                 self.layer = DoodleNote.layers.indexOf(DoodleNote.layers.activeLayer);
-
                 // Draw to current state
                 self.draw();
-
                 // Prevents cursor changing to a selection pointer
                 return false;
             }
@@ -1016,16 +886,12 @@ DoodleNoteTool_line.prototype.init = function()
         {
             // Terminate drawing
             self.drawing = false;
-
             // Get last set of points
             self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
-
             // Clear the toolCanvas
             self.ctx.clearRect(0, 0, DoodleNote.layers.width, DoodleNote.layers.height);
-
             // Get the layer context
             self.ctx = DoodleNote.layers.layers[self.layer]['ctx'];
-
             // Set the composite operation and styling
             self.ctx.lineWidth                = DoodleNote.toolWidth;
             self.ctx.lineJoin                 = self.lineJoin;
@@ -1033,10 +899,8 @@ DoodleNoteTool_line.prototype.init = function()
             self.ctx.strokeStyle              = '#' + DoodleNote.colors.activeColor;
             self.ctx.fillStyle                = '#' + DoodleNote.colors.activeColor;
             self.ctx.globalCompositeOperation = 'source-over';
-
             // Draw final state
             self.draw();
-
             // Reset
             self.points = [];
         }
@@ -1047,14 +911,12 @@ DoodleNoteTool_line.prototype.draw = function()
     // Draw initial point
     this.ctx.moveTo(this.points[0].x, this.points[0].y);
     this.ctx.beginPath();
-
     // Line to all points (including first, for smooth operation)
     this.ctx.beginPath();
     for (i = 0; i < this.points.length; i++)
     {
         this.ctx.lineTo(this.points[i].x, this.points[i].y);
     }
-
     // Line to the mouse position if still drawing
     if (this.drawing)
         this.ctx.lineTo(this.offset.x, this.offset.y);
@@ -1062,11 +924,7 @@ DoodleNoteTool_line.prototype.draw = function()
     this.ctx.stroke();
 };
 
-/*
-###############################################################################
-# The circle Tool
-###############################################################################
-*/
+// circle
 function DoodleNoteTool_circle(DoodleNote)
 {
     // initialisation
@@ -1075,6 +933,11 @@ function DoodleNoteTool_circle(DoodleNote)
     this.trigger  = 'circle';
     this.lineJoin = this.DoodleNote.lineJoin;
     this.lineCap  = this.DoodleNote.lineCap;
+    this.drawing  = false;
+    this.points   = [];
+    this.offset   = undefined;
+    this.ctx      = null;
+    this.layer    = null;
 };
 DoodleNoteTool_circle.prototype.init = function()
 {
@@ -1183,16 +1046,12 @@ DoodleNoteTool_circle.prototype.draw = function()
 
     // Line to the mouse position if still drawing
     if (this.drawing)
-        this.ctx.lineTo(this.offset.x, this.offset.y);
+        this.ctx.strokearc(this.offset.x, this.offset.y,Math.PI*2);
 
     this.ctx.stroke();
 };
 
-/*
-###############################################################################
-# The circle Tool
-###############################################################################
-*/
+// rectangle
 function DoodleNoteTool_rectangle(DoodleNote)
 {
     // initialisation
@@ -1208,13 +1067,10 @@ DoodleNoteTool_rectangle.prototype.init = function()
     DoodleNoteUtil_createToolTrigger(this);
 
     // Event handlers [Tool]
-    new DoodleNoteUtil_bindLineEvents(this, this.lineJoin, this.lineCap, false);
+    new DoodleNoteUtil_bindLineEvents(this, this.lineJoin, this.lineCap, true);
 };
-/*
-###############################################################################
-# Toolbar
-###############################################################################
-*/
+
+//Toolbar
 function DoodleNote_Toolbar(DoodleNote, settings)
 {
     this.DoodleNote = DoodleNote;
@@ -1262,11 +1118,6 @@ DoodleNote_Toolbar.prototype.build = function()
     for (i = 0; i < this.ctrls.length; ++i) this.ctrls[i].init();
 };
 
-/*
-###############################################################################
-# Auto-instance for DOM elements with the DoodleNote class attribute
-###############################################################################
-*/
 $(document).ready(function(){
     $('.DoodleNote').DoodleNote();
 });
