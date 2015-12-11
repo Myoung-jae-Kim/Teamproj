@@ -1100,12 +1100,12 @@ DoodleNoteTool_rectangle.prototype.draw = function()
     this.ctx.beginPath();
     for (i = 0; i < this.points.length; i++)
     {
-        this.ctx.strokeRect(this.points[i].x, this.points[i].y, this.points[i].w, this.points[i].h);
+        this.ctx.strokeRect(this.points[i].x, this.points[i].y, 40, 40);
     }
 
     // Line to the mouse position if still drawing
     if (this.drawing)
-        this.ctx.strokeRect(this.offset.x, this.offset.y, this.points[i].w, this.points[i].h);
+        this.ctx.strokeRect(this.offset.x, this.offset.y, 40, 40);
 
     this.ctx.stroke();
     // this.ctx.fillRect(rect.startX, rect.startY, rect.w, rect.h);
