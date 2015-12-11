@@ -286,7 +286,9 @@ function DoodleNoteUtil_canvasMousePos(parent, mouse)
     var offset = parent.offset();
     return {
         x: Math.floor(mouse.pageX - offset.left),
-        y: Math.floor(mouse.pageY - offset.top - 32)
+        y: Math.floor(mouse.pageY - offset.top - 32),
+        w:(mouse.pageX - offset.left),
+        h:(mouse.pageY - offset.top)
     };
 }
 /*
@@ -801,7 +803,7 @@ function DoodleNoteTool_erase(DoodleNote)
 {
     // initialisation
     this.DoodleNote    = DoodleNote;
-    this.title    = this.DoodleNote.language['erase']['title'];;
+    this.title    = this.DoodleNote.language['erase']['title'];
     this.trigger  = 'erase';
     this.lineJoin = this.DoodleNote.lineJoin;
     this.lineCap  = this.DoodleNote.lineCap;
@@ -819,7 +821,7 @@ function DoodleNoteTool_line(DoodleNote)
 {
     // initialisation
     this.DoodleNote    = DoodleNote;
-    this.title    = this.DoodleNote.language['line']['title'];;
+    this.title    = this.DoodleNote.language['line']['title'];
     this.trigger  = 'line';
     this.lineJoin = this.DoodleNote.lineJoin;
     this.lineCap  = this.DoodleNote.lineCap;
@@ -929,7 +931,7 @@ function DoodleNoteTool_circle(DoodleNote)
 {
     // initialisation
     this.DoodleNote    = DoodleNote;
-    this.title    = this.DoodleNote.language['circle']['title'];;
+    this.title    = this.DoodleNote.language['circle']['title'];
     this.trigger  = 'circle';
     this.lineJoin = this.DoodleNote.lineJoin;
     this.lineCap  = this.DoodleNote.lineCap;
@@ -943,7 +945,6 @@ DoodleNoteTool_circle.prototype.init = function()
 {
     // Event Handlers [Trigger]
     DoodleNoteUtil_createToolTrigger(this);
-
     // Event handlers [Tool]
     // new DoodleNoteUtil_bindLineEvents(this, this.lineJoin, this.lineCap, false);
     var self    = this;
@@ -957,10 +958,8 @@ DoodleNoteTool_circle.prototype.init = function()
             {
                 // Initiate drawing
                 self.drawing = true;
-
                 // Get the toolCanvas context
                 self.ctx = DoodleNote.layers.toolCanvas[0].getContext('2d');
-
                 // Set the composite operation and styling
                 self.ctx.lineWidth                = DoodleNote.toolWidth;
                 self.ctx.lineJoin                 = self.lineJoin;
@@ -968,17 +967,13 @@ DoodleNoteTool_circle.prototype.init = function()
                 self.ctx.strokeStyle              = '#' + DoodleNote.colors.activeColor;
                 self.ctx.fillStyle                = '#' + DoodleNote.colors.activeColor;
                 self.ctx.globalCompositeOperation = 'source-over';
-
                 // Push first point
                 self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
                 self.points.push({'x': self.offset.x, 'y': self.offset.y});
-
                 // Get the operating layer
                 self.layer = DoodleNote.layers.indexOf(DoodleNote.layers.activeLayer);
-
                 // Draw to current state
                 self.draw();
-
                 // Prevents cursor changing to a selection pointer
                 return false;
             }
@@ -998,38 +993,9 @@ DoodleNoteTool_circle.prototype.init = function()
             self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
             self.draw();
         }
-    }).on('dblclick mouseout', 'canvas', function(e)
-    {
-        if (DoodleNote.activeTool == self.trigger && self.drawing)
-        {
-            // Terminate drawing
-            self.drawing = false;
-
-            // Get last set of points
-            self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
-
-            // Clear the toolCanvas
-            self.ctx.clearRect(0, 0, DoodleNote.layers.width, DoodleNote.layers.height);
-
-            // Get the layer context
-            self.ctx = DoodleNote.layers.layers[self.layer]['ctx'];
-
-            // Set the composite operation and styling
-            self.ctx.lineWidth                = DoodleNote.toolWidth;
-            self.ctx.lineJoin                 = self.lineJoin;
-            self.ctx.lineCap                  = self.lineCap;
-            self.ctx.strokeStyle              = '#' + DoodleNote.colors.activeColor;
-            self.ctx.fillStyle                = '#' + DoodleNote.colors.activeColor;
-            self.ctx.globalCompositeOperation = 'source-over';
-
-            // Draw final state
-            self.draw();
-
-            // Reset
-            self.points = [];
-        }
     });
 };
+
 
 DoodleNoteTool_circle.prototype.draw = function()
 {
@@ -1056,18 +1022,93 @@ function DoodleNoteTool_rectangle(DoodleNote)
 {
     // initialisation
     this.DoodleNote    = DoodleNote;
-    this.title    = this.DoodleNote.language['rectangle']['title'];;
+    this.title    = this.DoodleNote.language['rectangle']['title'];
     this.trigger  = 'rectangle';
     this.lineJoin = this.DoodleNote.lineJoin;
     this.lineCap  = this.DoodleNote.lineCap;
+    this.drawing  = false;
+    this.points   = [];
+    this.offset   = undefined;
+    this.ctx      = null;
+    this.layer    = null;
 };
+
 DoodleNoteTool_rectangle.prototype.init = function()
 {
     // Event Handlers [Trigger]
     DoodleNoteUtil_createToolTrigger(this);
-
     // Event handlers [Tool]
-    new DoodleNoteUtil_bindLineEvents(this, this.lineJoin, this.lineCap, true);
+    // new DoodleNoteUtil_bindLineEvents(this, this.lineJoin, this.lineCap, true);
+    var self    = this;
+    var DoodleNote   = this.DoodleNote;
+
+    this.DoodleNote.on('mousedown', 'canvas', function(e)
+    {
+        if (DoodleNote.activeTool == self.trigger)
+        {
+            if (!self.drawing)
+            {
+                // Initiate drawing
+                self.drawing = true;
+                // Get the toolCanvas context
+                self.ctx = DoodleNote.layers.toolCanvas[0].getContext('2d');
+                // Set the composite operation and styling
+                self.ctx.lineWidth                = DoodleNote.toolWidth;
+                self.ctx.lineJoin                 = self.lineJoin;
+                self.ctx.lineCap                  = self.lineCap;
+                self.ctx.strokeStyle              = '#' + DoodleNote.colors.activeColor;
+                self.ctx.fillStyle                = '#' + DoodleNote.colors.activeColor;
+                self.ctx.globalCompositeOperation = 'source-over';
+                // Push first point
+                self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
+                self.points.push({'x': self.offset.x, 'y': self.offset.y, 'w': self.offset.w - self.offset.x, 'y': self.offset.h - self.offset.y});
+                // Get the operating layer
+                self.layer = DoodleNote.layers.indexOf(DoodleNote.layers.activeLayer);
+                // Draw to current state
+                self.draw();
+                // Prevents cursor changing to a selection pointer
+                return false;
+            }
+            else
+            {
+                self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
+                self.points.push({'x': self.offset.x, 'y': self.offset.y, 'w': self.offset.w - self.offset.x, 'h': self.offset.h - self.offset.y});
+            }
+        }
+    }).on('mousemove', 'canvas', function(e)
+    {
+        if (DoodleNote.activeTool == self.trigger && self.drawing)
+        {
+            // rect.w = (e.pageX - this.offsetLeft) - rect.startX;
+            // rect.h = (e.pageY - this.offsetTop) - rect.startY;
+            // Clear the toolCanvas
+            self.ctx.clearRect(0, 0, DoodleNote.layers.width, DoodleNote.layers.height);
+
+            self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
+            self.draw();
+        }
+    });
+};
+
+DoodleNoteTool_rectangle.prototype.draw = function()
+{
+    // Draw initial point
+    this.ctx.moveTo(this.points[0].x, this.points[0].y);
+    this.ctx.beginPath();
+
+    // Line to all points (including first, for smooth operation)
+    this.ctx.beginPath();
+    for (i = 0; i < this.points.length; i++)
+    {
+        this.ctx.strokeRect(this.points[i].x, this.points[i].y, this.points[i].w, this.points[i].h);
+    }
+
+    // Line to the mouse position if still drawing
+    if (this.drawing)
+        this.ctx.strokeRect(this.offset.x, this.offset.y, this.points[i].w, this.points[i].h);
+
+    this.ctx.stroke();
+    // this.ctx.fillRect(rect.startX, rect.startY, rect.w, rect.h);
 };
 
 //Toolbar
