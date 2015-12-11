@@ -287,8 +287,6 @@ function DoodleNoteUtil_canvasMousePos(parent, mouse)
     return {
         x: Math.floor(mouse.pageX - offset.left),
         y: Math.floor(mouse.pageY - offset.top - 32),
-        w:(mouse.pageX - offset.left),
-        h:(mouse.pageY - offset.top)
     };
 }
 /*
@@ -1007,12 +1005,12 @@ DoodleNoteTool_circle.prototype.draw = function()
     this.ctx.beginPath();
     for (i = 0; i < this.points.length; i++)
     {
-        this.ctx.lineTo(this.points[i].x, this.points[i].y);
+        this.ctx.arc(this.points[i].x, this.points[i].y,40,40,Math.PI*2);
     }
 
-    // Line to the mouse position if still drawing
+    // Circle to the mouse position if still drawing
     if (this.drawing)
-        this.ctx.strokearc(this.offset.x, this.offset.y,Math.PI*2);
+        this.ctx.arc(this.offset.x, this.offset.y,40,40,Math.PI*2);
 
     this.ctx.stroke();
 };
@@ -1028,6 +1026,7 @@ function DoodleNoteTool_rectangle(DoodleNote)
     this.lineCap  = this.DoodleNote.lineCap;
     this.drawing  = false;
     this.points   = [];
+    this.endpoints = [];
     this.offset   = undefined;
     this.ctx      = null;
     this.layer    = null;
@@ -1061,7 +1060,7 @@ DoodleNoteTool_rectangle.prototype.init = function()
                 self.ctx.globalCompositeOperation = 'source-over';
                 // Push first point
                 self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
-                self.points.push({'x': self.offset.x, 'y': self.offset.y, 'w': self.offset.w - self.offset.x, 'y': self.offset.h - self.offset.y});
+                self.points.push({'x': self.offset.x, 'y': self.offset.y});
                 // Get the operating layer
                 self.layer = DoodleNote.layers.indexOf(DoodleNote.layers.activeLayer);
                 // Draw to current state
@@ -1072,7 +1071,7 @@ DoodleNoteTool_rectangle.prototype.init = function()
             else
             {
                 self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
-                self.points.push({'x': self.offset.x, 'y': self.offset.y, 'w': self.offset.w - self.offset.x, 'h': self.offset.h - self.offset.y});
+                self.points.push({'x': self.offset.x, 'y': self.offset.y});
             }
         }
     }).on('mousemove', 'canvas', function(e)
@@ -1081,6 +1080,7 @@ DoodleNoteTool_rectangle.prototype.init = function()
         {
             // rect.w = (e.pageX - this.offsetLeft) - rect.startX;
             // rect.h = (e.pageY - this.offsetTop) - rect.startY;
+              self.endpoints.push({'x': (e.pageX - this.offsetLeft) - self.offset.x, 'y': (e.pageY - this.offsetTop) - self.offset.y});
             // Clear the toolCanvas
             self.ctx.clearRect(0, 0, DoodleNote.layers.width, DoodleNote.layers.height);
 
@@ -1096,16 +1096,16 @@ DoodleNoteTool_rectangle.prototype.draw = function()
     this.ctx.moveTo(this.points[0].x, this.points[0].y);
     this.ctx.beginPath();
 
-    // Line to all points (including first, for smooth operation)
+    //Rect to all points (including first, for smooth operation)
     this.ctx.beginPath();
     for (i = 0; i < this.points.length; i++)
     {
-        this.ctx.strokeRect(this.points[i].x, this.points[i].y, 40, 40);
+        this.ctx.strokeRect(this.points[i].x, this.points[i].y, this.endpoints[i].x, this.endpoints[i].y);
     }
 
-    // Line to the mouse position if still drawing
+    //Rect to the mouse position if still drawing
     if (this.drawing)
-        this.ctx.strokeRect(this.offset.x, this.offset.y, 40, 40);
+        this.ctx.strokeRect(this.offset.x, this.offset.y, 0, 0);
 
     this.ctx.stroke();
     // this.ctx.fillRect(rect.startX, rect.startY, rect.w, rect.h);
