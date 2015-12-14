@@ -1026,7 +1026,7 @@ DoodleNoteTool_circle.prototype.draw = function()
 {
     // Draw initial point
     this.ctx.moveTo(this.points[0].x, this.points[0].y);
-    this.ctx.beginPath();
+    // this.ctx.beginPath();
 
     // Line to all points (including first, for smooth operation)
     this.ctx.beginPath();
@@ -1035,11 +1035,13 @@ DoodleNoteTool_circle.prototype.draw = function()
         this.ctx.arc(this.points[i].x, this.points[i].y,40,0,Math.PI*2);
     }
 
+    // this.ctx.closePath();
     // Circle to the mouse position if still drawing
     if (this.drawing)
         // this.ctx.moveTo(this.offset.x, this.offset.y);
         this.ctx.arc(this.offset.x, this.offset.y,40,0,Math.PI*2);
 
+    // this.ctx.closePath();
     this.ctx.stroke();
 };
 
