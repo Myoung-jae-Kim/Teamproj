@@ -121,9 +121,9 @@ $.fn.DoodleNote = function(modifiedSettings, modifiedLanguages)
                                       '\n\nAre you sure you want to proceed?',
                 'clearLayerWarning' : 'Everything on the current layer will be erased.' +
                                       '\n\nAre you sure you want to proceed?',
-                'resizeToolPrompt'  : 'Enter desired tool size.' +
-                                      '\n\nMinimum size: 1, 최대크기: [MAXSIZE].',
-                'resizeToolWarning' : 'Tool size must be 1 or more, 최대크기 [MAXSIZE].',
+                'resizeToolPrompt'  : 'Enter desired 1 - [MAXSIZE] tool size.' +
+                                      '\n\n최소크기: 1, 최대크기: [MAXSIZE].',
+                'resizeToolWarning' : 'Tool size must be 1 or more, less than [MAXSIZE].',
                 'save'              : 'Save',
                 'load'              : 'Load'
             },
