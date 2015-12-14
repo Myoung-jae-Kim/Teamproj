@@ -857,6 +857,7 @@ DoodleNoteTool_line.prototype.init = function()
                 // Push first point
                 self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
                 self.points.push({'x': self.offset.x, 'y': self.offset.y});
+                // self.points.push({'x': e.pageX - this.offsetLeft, 'y': e.pageY - this.offsetTop});
                 // Get the operating layer
                 self.layer = DoodleNote.layers.indexOf(DoodleNote.layers.activeLayer);
                 // Draw to current state
@@ -868,6 +869,7 @@ DoodleNoteTool_line.prototype.init = function()
             {
                 self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
                 self.points.push({'x': self.offset.x, 'y': self.offset.y});
+                // self.points.push({'x': e.pageX - this.offsetLeft, 'y': e.pageY - this.offsetTop});
             }
         }
     }).on('mousemove', 'canvas', function(e)
@@ -977,8 +979,9 @@ DoodleNoteTool_circle.prototype.init = function()
             }
             else
             {
-                self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
-                self.points.push({'x': self.offset.x, 'y': self.offset.y});
+                // self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
+                // self.points.push({'x': self.offset.x, 'y': self.offset.y});
+                self.points.push({'x': e.pageX - this.offsetLeft, 'y': e.pageY - this.offsetTop})
             }
         }
     }).on('mousemove', 'canvas', function(e)
@@ -990,6 +993,30 @@ DoodleNoteTool_circle.prototype.init = function()
 
             self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
             self.draw();
+        }
+    }).on('dblclick mouseout', 'canvas', function(e)
+    {
+        if (DoodleNote.activeTool == self.trigger && self.drawing)
+        {
+            // Terminate drawing
+            self.drawing = false;
+            // Get last set of points
+            self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
+            // Clear the toolCanvas
+            self.ctx.clearRect(0, 0, DoodleNote.layers.width, DoodleNote.layers.height);
+            // Get the layer context
+            self.ctx = DoodleNote.layers.layers[self.layer]['ctx'];
+            // Set the composite operation and styling
+            self.ctx.lineWidth                = DoodleNote.toolWidth;
+            self.ctx.lineJoin                 = self.lineJoin;
+            self.ctx.lineCap                  = self.lineCap;
+            self.ctx.strokeStyle              = '#' + DoodleNote.colors.activeColor;
+            self.ctx.fillStyle                = '#' + DoodleNote.colors.activeColor;
+            self.ctx.globalCompositeOperation = 'source-over';
+            // Draw final state
+            self.draw();
+            // Reset
+            self.points = [];
         }
     });
 };
@@ -1005,12 +1032,13 @@ DoodleNoteTool_circle.prototype.draw = function()
     this.ctx.beginPath();
     for (i = 0; i < this.points.length; i++)
     {
-        this.ctx.arc(this.points[i].x, this.points[i].y,40,40,Math.PI*2);
+        this.ctx.arc(this.points[i].x, this.points[i].y,40,0,Math.PI*2);
     }
 
     // Circle to the mouse position if still drawing
     if (this.drawing)
-        this.ctx.arc(this.offset.x, this.offset.y,40,40,Math.PI*2);
+        // this.ctx.moveTo(this.offset.x, this.offset.y);
+        this.ctx.arc(this.offset.x, this.offset.y,40,0,Math.PI*2);
 
     this.ctx.stroke();
 };
@@ -1026,7 +1054,7 @@ function DoodleNoteTool_rectangle(DoodleNote)
     this.lineCap  = this.DoodleNote.lineCap;
     this.drawing  = false;
     this.points   = [];
-    this.endpoints = [];
+    // this.endpoints = [];
     this.offset   = undefined;
     this.ctx      = null;
     this.layer    = null;
@@ -1061,6 +1089,7 @@ DoodleNoteTool_rectangle.prototype.init = function()
                 // Push first point
                 self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
                 self.points.push({'x': self.offset.x, 'y': self.offset.y});
+                // self.points.push({'x': e.pageX - this.offsetLeft, 'y': e.pageY - this.offsetTop});
                 // Get the operating layer
                 self.layer = DoodleNote.layers.indexOf(DoodleNote.layers.activeLayer);
                 // Draw to current state
@@ -1070,8 +1099,9 @@ DoodleNoteTool_rectangle.prototype.init = function()
             }
             else
             {
-                self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
-                self.points.push({'x': self.offset.x, 'y': self.offset.y});
+                // self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
+                // self.points.push({'x': self.offset.x, 'y': self.offset.y});
+                self.points.push({'x': e.pageX - this.offsetLeft, 'y': e.pageY - this.offsetTop});
             }
         }
     }).on('mousemove', 'canvas', function(e)
@@ -1080,12 +1110,36 @@ DoodleNoteTool_rectangle.prototype.init = function()
         {
             // rect.w = (e.pageX - this.offsetLeft) - rect.startX;
             // rect.h = (e.pageY - this.offsetTop) - rect.startY;
-              self.endpoints.push({'x': (e.pageX - this.offsetLeft) - self.offset.x, 'y': (e.pageY - this.offsetTop) - self.offset.y});
+              // self.endpoints.push({'w': (e.pageX - this.offsetLeft) - this.points.[0].x, 'h': (e.pageY - this.offsetTop) - this.points[0].y});
             // Clear the toolCanvas
             self.ctx.clearRect(0, 0, DoodleNote.layers.width, DoodleNote.layers.height);
 
             self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
             self.draw();
+        }
+    }).on('dblclick mouseout', 'canvas', function(e)
+    {
+        if (DoodleNote.activeTool == self.trigger && self.drawing)
+        {
+            // Terminate drawing
+            self.drawing = false;
+            // Get last set of points
+            self.offset = DoodleNoteUtil_canvasMousePos(DoodleNote, e);
+            // Clear the toolCanvas
+            self.ctx.clearRect(0, 0, DoodleNote.layers.width, DoodleNote.layers.height);
+            // Get the layer context
+            self.ctx = DoodleNote.layers.layers[self.layer]['ctx'];
+            // Set the composite operation and styling
+            self.ctx.lineWidth                = DoodleNote.toolWidth;
+            self.ctx.lineJoin                 = self.lineJoin;
+            self.ctx.lineCap                  = self.lineCap;
+            self.ctx.strokeStyle              = '#' + DoodleNote.colors.activeColor;
+            self.ctx.fillStyle                = '#' + DoodleNote.colors.activeColor;
+            self.ctx.globalCompositeOperation = 'source-over';
+            // Draw final state
+            self.draw();
+            // Reset
+            self.points = [];
         }
     });
 };
@@ -1100,12 +1154,15 @@ DoodleNoteTool_rectangle.prototype.draw = function()
     this.ctx.beginPath();
     for (i = 0; i < this.points.length; i++)
     {
-        this.ctx.strokeRect(this.points[i].x, this.points[i].y, this.endpoints[i].x, this.endpoints[i].y);
+        // this.ctx.strokeRect(this.points[0].x, this.points[0].y, this.endpoints[i].x, this.endpoints[i].y);
+        this.ctx.strokeRect(this.points[i].x, this.points[i].y, 40, 40);
     }
 
     //Rect to the mouse position if still drawing
     if (this.drawing)
-        this.ctx.strokeRect(this.offset.x, this.offset.y, 0, 0);
+        // this.ctx.strokeRect(this.offset.x, this.offset.y, 0, 0);
+        this.ctx.strokeRect(this.offset.x, this.offset.y,40,40);
+
 
     this.ctx.stroke();
     // this.ctx.fillRect(rect.startX, rect.startY, rect.w, rect.h);
